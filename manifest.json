@@ -1,0 +1,28 @@
+{
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "thunderbirdaccountcopy@ucf.edu",
+            "strict_min_version": "102"
+        }
+    },
+    "manifest_version": 2,
+        "name": "Account Copy",
+    "version": "1.0",
+    "author": "Lasana Murray",
+    "homepage_url": "https://github.com/metasansana/thunderbird-account-copy",
+    "description": "A Thunderbird extension for copying data between mail accounts.",
+    "icons": {
+        "16": "icons/icon16.png",
+        "32": "icons/icon32.png",
+        "64": "icons/icon64.png"
+    },
+    "browser_action": {
+        "allowed_spaces": ["mail"],
+        "default_icon": "img/icon64.png",
+        "default_title": "Thunderbird Account Copy"
+    },
+    "background": {
+        "scripts": ["chrome/main.js"]
+    },
+    "permissions": ["tabs"]
+}
