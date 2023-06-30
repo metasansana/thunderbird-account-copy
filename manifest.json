@@ -6,7 +6,7 @@
         }
     },
     "manifest_version": 2,
-        "name": "Account Copy",
+    "name": "Account Copy",
     "version": "1.0",
     "author": "Lasana Murray",
     "homepage_url": "https://github.com/metasansana/thunderbird-account-copy",
@@ -22,7 +22,7 @@
         "default_title": "Thunderbird Account Copy"
     },
     "background": {
-        "scripts": ["chrome/main.js"]
+        "scripts": ["background.js"]
     },
     "permissions": ["tabs"]
 }
