@@ -17,12 +17,11 @@
         "64": "icons/icon64.png"
     },
     "browser_action": {
-        "allowed_spaces": ["mail"],
         "default_icon": "img/icon64.png",
         "default_title": "Thunderbird Account Copy"
     },
     "background": {
-        "scripts": ["background.js"]
+        "page": "background.html"
     },
-    "permissions": ["tabs"]
+    "permissions": ["tabs", "accountsRead"]
 }
