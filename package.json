@@ -1,0 +1,11 @@
+{
+    "name": "tbc",
+    "private": true,
+    "version": "1.0.0",
+    "scripts": {
+        "format": "./node_modules/.bin/prettier --write ./**/*.{js,css,html,json}"
+    },
+    "devDependencies": {
+        "prettier": "^3.0.0"
+    }
+}
