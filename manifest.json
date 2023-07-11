@@ -23,5 +23,15 @@
     "background": {
         "page": "background.html"
     },
+    "experiment_apis": {
+        "MessageFilters": {
+            "schema": "api/MessageFilters/schema.json",
+            "parent": {
+                "scopes": ["addon_parent"],
+                "paths": [["MessageFilters"]],
+                "script": "api/MessageFilters/implementation.js"
+            }
+        }
+    },
     "permissions": ["tabs", "accountsRead"]
 }

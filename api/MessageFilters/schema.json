@@ -1,0 +1,36 @@
+[
+    {
+        "namespace": "MessageFilters",
+        "functions": [
+            {
+                "name": "getForAccount",
+                "type": "function",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "description": "The id of the account to return filters for."
+                    }
+                ]
+            },
+            {
+                "name": "copy",
+                "type": "function",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "src",
+                        "type": "string",
+                        "description": "The id of the account to copy filters from."
+                    },
+                    {
+                        "name": "dest",
+                        "type": "string",
+                        "description": "The id of the account to copy filters to."
+                    }
+                ]
+            }
+        ]
+    }
+]
