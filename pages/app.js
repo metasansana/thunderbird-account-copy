@@ -1,9 +1,74 @@
 import * as events from "/events.js";
+import * as status from "/status.js";
+
+class Dialogs {
+    /**
+     * @type {HTMLDialogElement}
+     */
+    el;
+
+    /**
+     * @param {HTMLDialogElement} el
+     */
+    constructor(el) {
+        this.el = el;
+    }
+
+    /**
+     * @param {string} msg
+     */
+    async tell(msg) {
+        return new Promise(resolve => {
+            let container = document
+                .getElementById("dialogContainer")
+                .content.cloneNode(true);
+            container.querySelector("#dialogBody").textContent = msg;
+            container.querySelector("#dialogCancel").remove();
+
+            this.el.replaceChildren(container);
+            this.el.showModal();
+        });
+    }
+
+    /**
+     * @param {string} msg
+     *
+     * @return {boolean}
+     */
+    async prompt(msg) {
+        return new Promise(resolve => {
+            let container = document
+                .getElementById("dialogContainer")
+                .content.cloneNode(true);
+            container.querySelector("#dialogBody").textContent = msg;
+
+            container
+                .querySelector("#dialogCancel")
+                .addEventListener("click", () => {
+                    resolve(false);
+                });
+            container
+                .querySelector("#dialogOk")
+                .addEventListener("click", () => {
+                    resolve(true);
+                });
+
+            this.el.replaceChildren(container);
+
+            this.el.showModal();
+        });
+    }
+}
 
 /**
- * AppController is the main class for the content tab of this extension.
+ * TACFrontend is the main class for the content tab of this extension.
  */
-class AppController {
+class TACFrontend {
+    /**
+     * @type {Dialogs}
+     */
+    dialogs;
+
     /**
      * @type {HTMLSelectElement}
      */
@@ -18,11 +83,6 @@ class AppController {
      * @type {HTMLButtonElement}
      */
     startButton;
-
-    /**
-     * @type {HTMLDialogElement}
-     */
-    prompt;
 
     /**
      * @type {MailAccount[]}
@@ -43,6 +103,18 @@ class AppController {
             options.appendChild(option);
         }
         return options;
+    }
+
+    /**
+     * onMessage handles events from the background script.
+     */
+    async onMessage(evt) {
+        if (evt.type === events.EVENT_PROMPT_MSG_FILTER_CONFLICT) {
+            return await this.dialogs.prompt(
+                `We detected ${evt.conflicts.length} filters that already exist in
+             the destination account. Continue copying?`
+            );
+        }
     }
 
     /**
@@ -86,18 +158,16 @@ class AppController {
             destination: this.destSelect.value
         });
 
-        this.prompt.querySelector(
-            "#promptContent"
-        ).textContent = `Copied ${result} filters!`;
+        if (result.status === status.STATUS_ABORT) return;
 
-        this.prompt.showModal();
+        await this.dialogs.tell(`Copied ${result.count} filters successfully!`);
     }
 
     async run() {
+        this.dialogs = new Dialogs(document.getElementById("dialogs"));
         this.srcSelect = document.getElementById("source");
         this.destSelect = document.getElementById("destination");
         this.startButton = document.getElementById("start");
-        this.prompt = document.getElementById("prompt");
         this.accounts = await send({ type: events.EVENT_LIST_ACCOUNTS });
 
         this.srcSelect.appendChild(this.getAccountOptions(this.accounts));
@@ -109,11 +179,12 @@ class AppController {
     }
 
     static main() {
-        let ctl = new AppController();
-        window.addEventListener("load", () => ctl.run());
+        let app = new TACFrontend();
+        browser.runtime.onMessage.addListener(evt => app.onMessage(evt));
+        window.addEventListener("load", () => app.run());
     }
 }
 
 const send = evt => browser.runtime.sendMessage(evt);
 
-AppController.main();
+TACFrontend.main();

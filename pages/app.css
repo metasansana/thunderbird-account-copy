@@ -11,6 +11,15 @@ section.column {
     margin-bottom: 1rem;
 }
 
+dialog.dialogs {
+    max-width: 50%;
+}
+
+#dialogFooter {
+    margin-top: 2rem;
+    display: flex;
+}
+
 /* Utilities */
 .flexed {
     display: flex;
@@ -27,4 +36,8 @@ section.column {
 
 .ml-1 {
     margin-left: 1rem;
+}
+
+.ml-auto {
+    margin-left: auto;
 }

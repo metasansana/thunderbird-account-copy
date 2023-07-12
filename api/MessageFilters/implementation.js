@@ -4,10 +4,50 @@
     );
 
     /**
+     * @typedef {Object} FilterRef
+     * @property {string}   - name
+     * @property {string}   - description
+     * @property {string[]} - searchTerms
+     */
+
+    /**
      * MessageFilters provides an API into the nsIMsgFilter related internal
      * API.
      */
     const MessageFilters = {
+        /**
+         * getForAccount produces the filter list for an account.
+         * @param {string} key - The account key.
+         *
+         * @return {FilterRef[]}
+         */
+        async getForAccount(key) {
+            let refs = [];
+
+            let acct = MailServices.accounts.getAccount(key);
+
+            if (acct) {
+                let server = acct.incomingServer;
+
+                if (server) {
+                    let list = server.getFilterList(null);
+
+                    if (list)
+                        for (let i = 0; i < list.filterCount; i++) {
+                            let filter = list.getFilterAt(i);
+                            refs.push({
+                                name: filter.filterName,
+                                description: filter.filterDesc,
+                                searchTerms: filter.searchTerms.map(
+                                    term => term.termAsString
+                                )
+                            });
+                        }
+                }
+            }
+
+            return refs;
+        },
         /**
          * copy message filters between two accounts.
          *

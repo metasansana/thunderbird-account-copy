@@ -65,16 +65,26 @@
                 </div>
             </div>
         </main>
-        <dialog id="prompt">
-            <div class="container">
-                <div class="columns">
-                    <div id="promptContent" class="column col-12"></div>
-                </div>
-            </div>
+        <template id="dialogContainer">
             <form method="dialog">
-                <button class="primary">Ok</button>
+                <div class="container">
+                    <div class="columns">
+                        <div id="dialogBody" class="column col-12"></div>
+                        <div id="dialogFooter" class="column col-12">
+                            <button id="dialogCancel">Cancel</button>
+                            <button
+                                id="dialogOk"
+                                class="primary ml-auto"
+                                type="submit"
+                            >
+                                Ok
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </form>
-        </dialog>
+        </template>
+        <dialog id="dialogs"></dialog>
         <script type="module" src="app.js"></script>
     </body>
 </html>

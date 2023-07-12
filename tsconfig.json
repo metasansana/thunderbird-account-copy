@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "lib": ["dom", "esnext"],
+        "module": "esnext",
+        "target": "esnext",
+        "rootDir": ".",
+        "strict": true,
+        "types": ["node"],
+        "typeRoots": ["node_modules/@types"]
+    },
+    "exclude": ["node_modules"]
+}
