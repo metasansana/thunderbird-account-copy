@@ -3,9 +3,13 @@
     "private": true,
     "version": "1.0.0",
     "scripts": {
-        "format": "./node_modules/.bin/prettier --write ./**/*.{js,css,html,json}"
+        "format": "./node_modules/.bin/prettier --write ./**/*.{js,css,html,json}",
+        "lint": "./node_modules/.bin/eslint ."
     },
     "devDependencies": {
+        "eslint": "^8.45.0",
+        "eslint-config-prettier": "^8.8.0",
+        "eslint-plugin-prettier": "^5.0.0",
         "prettier": "^3.0.0"
     }
 }
