@@ -25,6 +25,12 @@ class Dialogs {
             container.querySelector("#dialogBody").textContent = msg;
             container.querySelector("#dialogCancel").remove();
 
+            let onClose = () => {
+                this.el.removeEventListener("close", onClose);
+                resolve();
+            };
+
+            this.el.addEventListener("close", onClose);
             this.el.replaceChildren(container);
             this.el.showModal();
         });
@@ -110,9 +116,15 @@ class TACFrontend {
      */
     async onMessage(evt) {
         if (evt.type === events.EVENT_PROMPT_MSG_FILTER_CONFLICT) {
-            return await this.dialogs.prompt(
+            return this.dialogs.prompt(
                 `We detected ${evt.conflicts.length} filters that already exist in
              the destination account. Continue copying?`
+            );
+        } else if (evt.type === events.EVENT_PROMPT_MSG_FOLDER_CONFLICT) {
+            return this.dialogs.prompt(
+                `We detected ${evt.conflicts.length} folders that already exist
+            in the destination account. If you continue, they will be merged.
+            Continue?`
             );
         }
     }
@@ -152,15 +164,32 @@ class TACFrontend {
      */
     async handleStartClicked() {
         this.startButton.setAttribute("disabled", "");
-        let result = await send({
+
+        let source = this.srcSelect.value;
+        let destination = this.destSelect.value;
+        let filterResult = await send({
             type: events.EVENT_COPY_MSG_FILTERS,
-            source: this.srcSelect.value,
-            destination: this.destSelect.value
+            source,
+            destination
         });
 
-        if (result.status === status.STATUS_ABORT) return;
+        if (filterResult.status === status.STATUS_ABORT) return;
 
-        await this.dialogs.tell(`Copied ${result.count} filters successfully!`);
+        await this.dialogs.tell(
+            `Copied ${filterResult.count} filters successfully!`
+        );
+
+        let folderResult = await send({
+            type: events.EVENT_COPY_MSG_FOLDERS,
+            source,
+            destination
+        });
+
+        if (folderResult.status === status.STATUS_ABORT) return;
+
+        let { folderCount } = folderResult;
+
+        await this.dialogs.tell(`Copied ${folderCount} folders successfully!`);
     }
 
     async run() {
