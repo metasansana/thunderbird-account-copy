@@ -465,7 +465,7 @@ class TACBackend {
     async main() {
         messenger.browserAction.onClicked.addListener(async () => {
             this.tab = await messenger.tabs.create({
-                url: "/pages/index.html"
+                url: "/content/index.html"
             });
         });
 

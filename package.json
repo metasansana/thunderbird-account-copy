@@ -4,7 +4,8 @@
     "version": "1.0.0",
     "scripts": {
         "format": "./node_modules/.bin/prettier --write ./**/*.{js,css,html,json}",
-        "lint": "./node_modules/.bin/eslint ."
+        "lint": "./node_modules/.bin/eslint .",
+        "build": "make"
     },
     "devDependencies": {
         "eslint": "^8.45.0",

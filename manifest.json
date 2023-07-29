@@ -21,7 +21,7 @@
         "default_title": "Thunderbird Account Copy"
     },
     "background": {
-        "page": "background.html"
+        "page": "background/index.html"
     },
     "experiment_apis": {
         "MessageFilters": {

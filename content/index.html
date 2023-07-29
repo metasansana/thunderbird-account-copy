@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Thunderbird Account Copy</title>
+        <link rel="stylesheet" href="spectre.min.css" />
+        <link
+            rel="stylesheet"
+            href="chrome://global/skin/in-content/common.css"
+        />
+        <link rel="stylesheet" href="app.css" />
+    </head>
+    <body>
+        <main>
+            <div class="container">
+                <div class="columns">
+                    <div class="column col-6 col-mx-auto">
+                        <div class="columns">
+                            <section class="column col-12 text-center">
+                                <div class="hero bg-gray">
+                                    <div class="hero-body">
+                                        <h1>Thunderbird Account Copy</h1>
+                                        <p>
+                                            Welcome! This tool helps you copy
+                                            data from one mail account to
+                                            another.
+                                        </p>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="column col-12">
+                                <h2 class="text-center">
+                                    Select the source and destination accounts.
+                                </h2>
+                                <div class="flexed">
+                                    <div class="card w-100 mr-1">
+                                        <div class="card-header">
+                                            <h4>Source Account</h4>
+                                            <select id="source">
+                                                <option value="" selected>
+                                                    From
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="card w-100 ml-1">
+                                        <div class="card-header">
+                                            <h4>Destination Account</h4>
+                                            <select id="destination">
+                                                <option value="" selected>
+                                                    To
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="column col-12">
+                                <button id="start" class="primary" disabled>
+                                    Start
+                                </button>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <template id="dialogContainer">
+            <form method="dialog">
+                <div class="container">
+                    <div class="columns">
+                        <div id="dialogBody" class="column col-12"></div>
+                        <div id="dialogFooter" class="column col-12">
+                            <button id="dialogCancel">Cancel</button>
+                            <button
+                                id="dialogOk"
+                                class="primary ml-auto"
+                                type="submit"
+                            >
+                                Ok
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </template>
+
+        <dialog id="dialogs"></dialog>
+        <script type="module" src="app.js"></script>
+    </body>
+</html>

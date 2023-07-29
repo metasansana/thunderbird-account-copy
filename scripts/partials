@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+
+const fs = require("node:fs/promises");
+
+const target = process.argv[2];
+
+const pattern = /<!--\s?@include:\s?([\w.-]+)\s?-->/g;
+
+const main = async () => {
+    let contents = await fs.readFile(target, "utf8");
+
+    for (let [text, path] of contents.matchAll(pattern)) {
+        let partial = await fs.readFile(`content/partials/${path}`, "utf8");
+
+        contents = contents.replace(text, partial);
+    }
+
+    console.log(contents);
+};
+
+main();
