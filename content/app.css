@@ -39,7 +39,28 @@ td.truncate {
 }
 
 tr.conflict {
-    background-color: #efb6a9;
+    background-color: #e55433;
+    color: #fff;
+}
+
+.folder-name.conflict {
+    color: #e55433;
+}
+
+ul.folder-list-list,
+ul.folder-list-list ul.folder-list-list {
+    list-style-type: none;
+    margin-left: 2rem;
+}
+
+.folder-name.conflicts {
+    font-weight: 900;
+}
+
+.loading {
+    display: block;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
 }
 
 /* Utilities */

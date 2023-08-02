@@ -8,7 +8,7 @@ import { Step } from "/content/steps/index.js";
  */
 export class FiltersStep extends Step {
     async onContinue() {
-        this.app.setCanContinue(false);
+        this.app.busy();
 
         let { source, destination } = this.app;
         let filterResult = await this.app.send({
@@ -29,7 +29,7 @@ export class FiltersStep extends Step {
     async show() {
         let { source, destination } = this.app;
         let filters = await this.app.send({
-            type: events.MSG_LIST_SOURCE_MSG_FILTERS,
+            type: events.MSG_COMPARE_MSG_FILTERS,
             source,
             destination
         });

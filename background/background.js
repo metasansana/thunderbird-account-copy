@@ -39,10 +39,10 @@ class ListAccounts extends TACBCommand {
 }
 
 /**
- * ListSourceMsgFilters provides a list of message filters from the source
+ * CompareMsgFilters provides a list of message filters from the source
  * account indicating which ones may be in conflict with the destination.
  */
-class ListSourceMsgFilters extends TACBCommand {
+class CompareMsgFilters extends TACBCommand {
     /**
      * isSame tests whether two filters are the same or not.
      *
@@ -115,6 +115,24 @@ class CopyMsgFilters extends TACBCommand {
 }
 
 /**
+ * CompareMsgFolders provides a list of message folders from the source
+ * account indicating which ones may be in conflict with the destination.
+ */
+class CompareMsgFolders extends TACBCommand {
+    /**
+     * @return {MailFolder[]}
+     */
+    async execute(evt) {
+        let { source, destination } = evt;
+        let srcAcct = await messenger.accounts.get(source, true);
+        let destAcct = await messenger.accounts.get(destination, true);
+        let srcFolders = MailFolderNode.fromAccount(srcAcct);
+        let destFolders = MailFolderNode.fromAccount(destAcct);
+        return srcFolders.compare(destFolders);
+    }
+}
+
+/**
  * CopyMsgFolders copies message folders from one account to another.
  *
  * This command will also take care of copying the messages included in the
@@ -130,20 +148,6 @@ class CopyMsgFolders extends TACBCommand {
         let destAcct = await messenger.accounts.get(destination, true);
         let srcFolders = MailFolderNode.fromAccount(srcAcct);
         let destFolders = MailFolderNode.fromAccount(destAcct);
-        let conflicts = srcFolders.compute(destFolders);
-
-        if (conflicts.length > 0) {
-            let yes = await this.send({
-                type: events.EVENT_PROMPT_MSG_FOLDER_CONFLICT,
-                conflicts
-            });
-            if (!yes)
-                return {
-                    type: "message-folders",
-                    status: status.STATUS_ABORT
-                };
-        }
-
         return Object.assign(
             {
                 type: "message-folders",
@@ -166,6 +170,76 @@ const folderTypes = [
 ];
 
 const ignoredFolderTypes = ["trash", "junk"];
+
+/**
+ * MailFolderConflictInfo stores information about conflicts between two folder
+ * trees.
+ */
+class MailFolderConflictInfo {
+    /**
+     * conflict indicates the folder for this node conflicts with a node at the
+     * same location in the compared tree.
+     *
+     * @type {boolean}
+     */
+    conflict = false;
+
+    /**
+     * conflicts is a count of all conflicts encountered in this folders children.
+     *
+     * @type {number}
+     */
+    conflicts = 0;
+
+    /**
+     * children MailFolderConflictInfo of this one.
+     *
+     * @type {MailFolderConflictInfo[]}
+     */
+    children = [];
+
+    /**
+     * name of the folder.
+     *
+     * @type {string}
+     */
+    name = "";
+
+    /**
+     * type of the folder retrieved from the underlying folder or "user" if
+     * none specified.
+     *
+     * @type {string}
+     */
+    type = "";
+
+    /**
+     * isSpecial indicates whether the folder is considered a special folder.
+     *
+     * @type {boolean}
+     */
+    isSpecial = false;
+
+    /**
+     * @param {string} name
+     * @param {string} type
+     * @param {boolean} isSpecial
+     */
+    constructor(name, type, isSpecial) {
+        this.name = name;
+        this.type = type;
+        this.isSpecial = isSpecial;
+    }
+
+    /**
+     * fromMailFolderNode creates a new instance from a MailFolderNode.
+     *
+     * Note that this only sets the name, type and isSpecial properties.
+     */
+    static fromMailFolderNode({ name, type, isSpecial }) {
+        return new MailFolderConflictInfo(name, type, isSpecial);
+    }
+}
 
 /**
  * MailFolderNode is a wrapper around messenger.folders'  MailFolder type.
@@ -220,7 +294,7 @@ class MailFolderNode {
      * @type {string}
      */
     get name() {
-        return this.folder.name;
+        return this.folder.name || "<root>";
     }
 
     /**
@@ -320,44 +394,47 @@ class MailFolderNode {
     }
 
     /**
-     * compute calculates which folders in the tree can be copied or merged
-     * to the destination.
+     * compare this MailFolderNode tree to another to determine which of this
+     * tree's nodes will conflict with it.
      *
-     * This method populates the copyTarget or mergeTarget properties
-     * recursively for each child node depending on whether the folder can
-     * be copied or needs to be merged respectively.
+     * This method returns a tree that stores conflict information for each
+     * node.
      *
-     * @param {MailFolderNode} destRoot
+     * @param {MailFolderNode} target
      *
-     * @return {MailFolderNode[]} - A list of the source folders that already
-     *                          exist at the destination.
+     * @return {MailFolderConflictInfo}
      */
-    compute(destRoot) {
-        let stack = [[this, destRoot]];
-        let destParent;
-        let conflicts = [];
-
+    compare(target) {
+        let root = new MailFolderConflictInfo(
+            this.name,
+            this.type,
+            this.isSpecial
+        );
+        let stack = [[this, target, root]];
         while (stack.length > 0) {
-            let [src, dest] = stack.pop();
+            let [src, dest, parent] = stack.pop();
 
-            if (!src.isRoot && !src.shouldIgnore) {
+            if (src.shouldIgnore) continue;
+
+            let clone = src.isRoot
+                ? parent
+                : MailFolderConflictInfo.fromMailFolderNode(src);
+
+            if (!src.isRoot) {
                 if (dest) {
-                    src.mergeTarget = dest;
-                    conflicts.push(src);
-                } else {
-                    src.copyTarget = destParent;
+                    clone.conflict = true;
+                    parent.conflicts++;
                 }
+                parent.children.push(clone);
             }
 
             for (let child of src.children) {
                 let destNode =
                     dest && dest.children.find(dc => dc.isSame(child));
-                stack.push([child, destNode]);
+                stack.push([child, destNode, clone]);
             }
-
-            destParent = dest;
         }
-        return conflicts;
+        return root;
     }
 
     /**
@@ -458,8 +535,9 @@ class TACBackend {
      */
     commands = new Map([
         [events.MSG_LIST_ACCOUNTS, new ListAccounts(this)],
-        [events.MSG_LIST_SOURCE_MSG_FILTERS, new ListSourceMsgFilters(this)],
+        [events.MSG_COMPARE_MSG_FILTERS, new CompareMsgFilters(this)],
         [events.MSG_COPY_MSG_FILTERS, new CopyMsgFilters(this)],
+        [events.MSG_COMPARE_MSG_FOLDERS, new CompareMsgFolders(this)],
         [events.MSG_COPY_MSG_FOLDERS, new CopyMsgFolders(this)]
     ]);
 

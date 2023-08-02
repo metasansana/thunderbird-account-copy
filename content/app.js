@@ -1,6 +1,7 @@
 import { Dialogs } from "/content/dialogs.js";
 import { StartStep } from "/content/steps/start.js";
 import { FiltersStep } from "/content/steps/filters.js";
+import { FoldersStep } from "/content/steps/folders.js";
 
 /**
  * TACFrontend is the main class for the content tab of this extension.
@@ -105,10 +106,27 @@ class TACFrontend {
     /**
      * next advances the pointer to the next step triggering its show()
      * method.
+     *
+     * If there are no more steps the app is reset to the first stage.
      */
     next() {
+        this.setCanContinue(true);
         this.index++;
-        this.current.show();
+        if (this.index === this.steps.length) {
+            this.start();
+        } else {
+            this.current.show();
+        }
+    }
+
+    /**
+     * busy is used to create a blocking effect for operations that should
+     * not be interrupted.
+     */
+    busy() {
+        this.setContent(this.current.getTemplate("loading"));
+        this.setCanContinue(false);
+        this.cancelButton.setAttribute("disabled", "");
     }
 
     /**
@@ -129,7 +147,11 @@ class TACFrontend {
      */
     start() {
         this.index = 0;
-        this.steps = [new StartStep(this), new FiltersStep(this)];
+        this.steps = [
+            new StartStep(this),
+            new FiltersStep(this),
+            new FoldersStep(this)
+        ];
         this.cancelButton.onclick = () => {
             this.start(); // resets the app.
         };
