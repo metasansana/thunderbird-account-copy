@@ -15,7 +15,19 @@
             <div class="container">
                 <div class="columns">
                     <div class="column col-6 col-mx-auto">
-                        <div id="content" class="columns"></div>
+                        <section id="content" class="columns"></section>
+                        <section class="columns">
+                            <section class="column col-12 flexed">
+                                <button id="cancelButton">Cancel</button>
+                                <button
+                                    id="continueButton"
+                                    class="primary"
+                                    disabled
+                                >
+                                    Start
+                                </button>
+                            </section>
+                        </section>
                     </div>
                 </div>
             </div>
@@ -60,7 +72,7 @@
                     <div class="card w-100 mr-1">
                         <div class="card-header">
                             <h4>Source Account</h4>
-                            <select id="source">
+                            <select id="source" name="src">
                                 <option value="" selected>From</option>
                             </select>
                         </div>
@@ -68,16 +80,48 @@
                     <div class="card w-100 ml-1">
                         <div class="card-header">
                             <h4>Destination Account</h4>
-                            <select id="destination">
+                            <select id="destination" name="dest">
                                 <option value="" selected>To</option>
                             </select>
                         </div>
                     </div>
                 </div>
             </section>
+        </template>
+
+        <template id="filtersStep">
             <section class="column col-12">
-                <button id="start" class="primary" disabled>Start</button>
+                <h1>Copy Filters</h1>
+                <p>
+                    The table below shows the message filters that will be
+                    copied to the destination account. Highlighted rows are ones
+                    that appear to already exist.
+                </p>
+                <p>
+                    If you continue with this operation, those filters may be
+                    duplicated.
+                </p>
+                <div class="table-window">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Exists?</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </section>
+        </template>
+
+        <template id="filtersStepRow">
+            <tr>
+                <td class="truncate"></td>
+                <td class="truncate"></td>
+                <td></td>
+            </tr>
         </template>
 
         <dialog id="dialogs"></dialog>

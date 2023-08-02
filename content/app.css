@@ -20,6 +20,28 @@ dialog.dialogs {
     display: flex;
 }
 
+#continueButton {
+    margin-left: auto;
+}
+
+.table-window {
+    max-width: 100%;
+    height: 250px;
+    overflow: auto;
+    padding: 1rem;
+    border: #c0c0c0 solid 1px;
+}
+
+td.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+tr.conflict {
+    background-color: #efb6a9;
+}
+
 /* Utilities */
 .flexed {
     display: flex;

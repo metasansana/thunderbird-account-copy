@@ -15,13 +15,26 @@
             <div class="container">
                 <div class="columns">
                     <div class="column col-6 col-mx-auto">
-                        <div id="content" class="columns"></div>
+                        <section id="content" class="columns"></section>
+                        <section class="columns">
+                            <section class="column col-12 flexed">
+                                <button id="cancelButton">Cancel</button>
+                                <button
+                                    id="continueButton"
+                                    class="primary"
+                                    disabled
+                                >
+                                    Start
+                                </button>
+                            </section>
+                        </section>
                     </div>
                 </div>
             </div>
         </main>
         <!-- @include: dialogs.html -->
-        <!-- @include: steps/start/start.html -->
+        <!-- @include: steps/start.html -->
+        <!-- @include: steps/filters.html -->
         <dialog id="dialogs"></dialog>
         <script type="module" src="app.js"></script>
     </body>

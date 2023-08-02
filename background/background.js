@@ -39,32 +39,52 @@ class ListAccounts extends TACBCommand {
 }
 
 /**
- * CopyMsgFilters copies message filters from one account to another.
+ * ListSourceMsgFilters provides a list of message filters from the source
+ * account indicating which ones may be in conflict with the destination.
  */
-class CopyMsgFilters extends TACBCommand {
+class ListSourceMsgFilters extends TACBCommand {
     /**
-     * getConflicts builds a list of filter references from the source list that
-     * seem to appear in the destination list.
+     * isSame tests whether two filters are the same or not.
      *
-     * Filters do not have uuid so some light heuristics are needed to detect
-     * potential duplicates.
+     * Filters do not have unique identifiers so we make an assumption based on
+     * the name, description and search terms of a filter.
      *
-     * @param {FilteRef[]} src
-     * @param {FilterRef[]} dest
+     * @param {FilterRef} filterA
+     * @param {FilterRef} filterB
      *
-     * @return {FilterRef[]}
+     * @return {boolean}
      */
-    getConflicts(src, dest) {
-        return src.filter(target =>
-            dest.find(
-                filter =>
-                    target.name === filter.name &&
-                    target.description === filter.description &&
-                    target.searchTerms.join() === target.searchTerms.join()
-            )
+    isSame(filterA, filterB) {
+        return (
+            filterA.name === filterB.name &&
+            filterA.description === filterB.description &&
+            filterA.searchTerms.join() === filterB.searchTerms.join()
         );
     }
 
+    /**
+     * Provides a modified list of filter refs that will each have a boolean
+     * valued "conflict" key.
+     *
+     * @return {FilterRef[]}
+     */
+    async execute(evt) {
+        let { source, destination } = evt;
+        let srcFilters = await messenger.MessageFilters.getForAccount(source);
+        let destFilters = await messenger.MessageFilters.getForAccount(
+            destination
+        );
+        return srcFilters.map(filter => {
+            let match = destFilters.find(f => this.isSame(filter, f));
+            return Object.assign({}, filter, { conflict: !!match });
+        });
+    }
+}
+
+/**
+ * CopyMsgFilters copies message filters from one account to another.
+ */
+class CopyMsgFilters extends TACBCommand {
     /**
      * @typedef {Object} CopyResult
      *
@@ -82,21 +102,6 @@ class CopyMsgFilters extends TACBCommand {
         let destFilters = await messenger.MessageFilters.getForAccount(
             destination
         );
-        let conflicts = this.getConflicts(srcFilters, destFilters);
-
-        if (conflicts.length > 0) {
-            let yes = await this.send({
-                type: events.EVENT_PROMPT_MSG_FILTER_CONFLICT,
-                filters: srcFilters,
-                conflicts
-            });
-            if (!yes)
-                return {
-                    type: "message-filters",
-                    status: status.STATUS_ABORT
-                };
-        }
-
         let count = await messenger.MessageFilters.copy(
             evt.source,
             evt.destination
@@ -452,9 +457,10 @@ class TACBackend {
      * @type {Map<string, TACBCommand>}
      */
     commands = new Map([
-        [events.EVENT_LIST_ACCOUNTS, new ListAccounts(this)],
-        [events.EVENT_COPY_MSG_FILTERS, new CopyMsgFilters(this)],
-        [events.EVENT_COPY_MSG_FOLDERS, new CopyMsgFolders(this)]
+        [events.MSG_LIST_ACCOUNTS, new ListAccounts(this)],
+        [events.MSG_LIST_SOURCE_MSG_FILTERS, new ListSourceMsgFilters(this)],
+        [events.MSG_COPY_MSG_FILTERS, new CopyMsgFilters(this)],
+        [events.MSG_COPY_MSG_FOLDERS, new CopyMsgFolders(this)]
     ]);
 
     /**

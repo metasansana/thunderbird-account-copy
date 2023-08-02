@@ -1,16 +1,13 @@
 import * as events from "/events.js";
 import * as status from "/status.js";
 
+import { Step } from "/content/steps/index.js";
+
 /**
  * StartStep is the first stage in the process and allows the user to select
  * the source an destination accounts.
  */
-export class StartStep {
-    /**
-     * @type {TACFrontend}
-     */
-    app;
-
+export class StartStep extends Step {
     /**
      * @type {HTMLSelectElement}
      */
@@ -22,21 +19,28 @@ export class StartStep {
     destSelect;
 
     /**
-     * @type {HTMLButtonElement}
-     */
-    startButton;
-
-    /**
      * @type {MailAccount[]}
      */
     accounts = [];
 
-    /**
-     * @param {TACFrontend} app
-     */
-    constructor(app) {
-        this.app = app;
+    get canContinue() {
+        return this.app.source && this.app.destination;
     }
+
+    /**
+     * onSelectChange enables the start button if both src and dest selects
+     * are valid.
+     *
+     * @param {Event} evt
+     */
+    onSelectChange = evt => {
+        if (evt.target.id === "source") {
+            this.app.source = evt.target.value;
+        } else if (evt.target.id === "destination") {
+            this.app.destination = evt.target.value;
+        }
+        this.app.setCanContinue(this.app.source && this.app.destination);
+    };
 
     /**
      * @param {MailAccount[]}
@@ -52,17 +56,6 @@ export class StartStep {
             options.appendChild(option);
         }
         return options;
-    }
-
-    /**
-     * getTemplate provides a copy of a template element's content given its id.
-     *
-     * @param {string{} id
-     *
-     * @return {DocumentFragment}
-     */
-    getTemplate(id) {
-        return document.getElementById(id).content.cloneNode(true);
     }
 
     /**
@@ -83,87 +76,19 @@ export class StartStep {
         }
     }
 
-    /**
-     * Dispatches the handle*() functions based on the details of the event
-     * that occurred.
-     * @param {Event} evt
-     */
-    async handleEvent(evt) {
-        switch (evt.type) {
-            case "change":
-                this.handleSelectChange();
-                break;
-
-            case "click":
-                this.handleStartClicked();
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    /**
-     * handleSelectChange enables the start button if both src and dest selects
-     * are valid.
-     */
-    handleSelectChange() {
-        if (this.srcSelect.value && this.destSelect.value)
-            this.startButton.removeAttribute("disabled");
-        else this.startButton.setAttribute("disabled", "");
-    }
-
-    /**
-     * handleStartClicked kicks off the copy process.
-     */
-    async handleStartClicked() {
-        this.startButton.setAttribute("disabled", "");
-
-        let source = this.srcSelect.value;
-        let destination = this.destSelect.value;
-        let filterResult = await this.app.send({
-            type: events.EVENT_COPY_MSG_FILTERS,
-            source,
-            destination
-        });
-
-        if (filterResult.status === status.STATUS_ABORT) return;
-
-        await this.app.dialogs.tell(
-            `Copied ${filterResult.count} filters successfully!`
-        );
-
-        let folderResult = await this.app.send({
-            type: events.EVENT_COPY_MSG_FOLDERS,
-            source,
-            destination
-        });
-
-        if (folderResult.status === status.STATUS_ABORT) return;
-
-        let { folderCount } = folderResult;
-
-        await this.app.dialogs.tell(
-            `Copied ${folderCount} folders successfully!`
-        );
-    }
-
-    async execute() {
+    async show() {
         let view = this.getTemplate("startStep");
 
         this.srcSelect = view.getElementById("source");
         this.destSelect = view.getElementById("destination");
-        this.startButton = view.getElementById("start");
         this.accounts = await this.app.send({
-            type: events.EVENT_LIST_ACCOUNTS
+            type: events.MSG_LIST_ACCOUNTS
         });
 
         this.srcSelect.appendChild(this.getAccountOptions(this.accounts));
         this.destSelect.appendChild(this.getAccountOptions(this.accounts));
-
-        this.srcSelect.addEventListener("change", this);
-        this.destSelect.addEventListener("change", this);
-        this.startButton.addEventListener("click", this);
+        this.srcSelect.onchange = this.onSelectChange;
+        this.destSelect.onchange = this.onSelectChange;
 
         this.app.setContent(view);
     }
