@@ -35,7 +35,14 @@ export class StartStep extends Step {
      */
     onSelectChange = evt => {
         if (evt.target.id === "source") {
-            this.app.source = evt.target.value;
+            let { value } = evt.target;
+            this.app.source = value;
+
+            let destAccounts = this.accounts.filter(acc => acc.id !== value);
+            for (let opt of [...this.destSelect.querySelectorAll("option")])
+                if (opt.value) opt.remove();
+
+            this.destSelect.appendChild(this.getAccountOptions(destAccounts));
         } else if (evt.target.id === "destination") {
             this.app.destination = evt.target.value;
         }
@@ -86,7 +93,6 @@ export class StartStep extends Step {
         });
 
         this.srcSelect.appendChild(this.getAccountOptions(this.accounts));
-        this.destSelect.appendChild(this.getAccountOptions(this.accounts));
         this.srcSelect.onchange = this.onSelectChange;
         this.destSelect.onchange = this.onSelectChange;
 
