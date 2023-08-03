@@ -548,9 +548,13 @@ class TACBackend {
      */
     async main() {
         messenger.browserAction.onClicked.addListener(async () => {
-            this.tab = await messenger.tabs.create({
-                url: "/content/index.html"
-            });
+            if (this.tab) {
+                await messenger.tabs.update(this.tab.id, { active: true });
+            } else {
+                this.tab = await messenger.tabs.create({
+                    url: "/content/index.html"
+                });
+            }
         });
 
         messenger.runtime.onMessage.addListener(async (evt, sender) => {
