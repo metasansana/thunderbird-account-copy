@@ -557,6 +557,10 @@ class TACBackend {
             }
         });
 
+        messenger.tabs.onRemoved.addListener(id => {
+            if (this.tab && this.tab.id === id) this.tab = null;
+        });
+
         messenger.runtime.onMessage.addListener(async (evt, sender) => {
             if (
                 typeof evt !== "object" ||
