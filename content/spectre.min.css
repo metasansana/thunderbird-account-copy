@@ -1,12 +1,4 @@
 /*! Spectre.css v0.5.9 | MIT License | github.com/picturepan2/spectre */
-html {
-    font-family: sans-serif;
-    -webkit-text-size-adjust: 100%;
-    -ms-text-size-adjust: 100%;
-}
-body {
-    margin: 0;
-}
 article,
 aside,
 footer,
@@ -186,18 +178,8 @@ template {
 }
 html {
     box-sizing: border-box;
-    font-size: 20px;
     line-height: 1.5;
     -webkit-tap-highlight-color: transparent;
-}
-body {
-    background: #fff;
-    color: #3b4351;
-    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI",
-        Roboto, "Helvetica Neue", sans-serif;
-    font-size: 0.8rem;
-    overflow-x: hidden;
-    text-rendering: optimizeLegibility;
 }
 a {
     color: #5755d9;

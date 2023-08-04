@@ -1,9 +1,11 @@
-main {
-    margin-top: 2rem;
+html,
+body {
+    height: 100%;
 }
 
 .hero {
     padding: 1rem 2rem;
+    background-color: var(--layout-background-2);
 }
 
 section.column {
