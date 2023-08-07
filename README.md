@@ -76,7 +76,7 @@ https://support.mozilla.org/en-US/kb/how-customize-toolbars#
 Before using this extension, ensure you have made a backup of your profile 
 folder. Copying of accounts is more or less a one way operation and there is
 **no** support for undoing a copy. You will have to delete the copied filters,
-messages and folders yourself or ideall restore your profile from a backup.
+messages and folders yourself or ideally restore your profile from a backup.
 
 ### Conflicts
 When conflicts are encountered, TBAC gives you two options:

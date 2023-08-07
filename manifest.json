@@ -9,7 +9,7 @@
     "name": "Account Copy",
     "version": "1.0",
     "author": "Lasana Murray",
-    "homepage_url": "https://github.com/metasansana/thunderbird-account-copy",
+    "homepage_url": "https://raw.githubusercontent.com/metasansana/thunderbird-account-copy/main/README.md",
     "description": "A Thunderbird extension for copying data between mail accounts.",
     "icons": {
         "16": "icons/icon16.png",
