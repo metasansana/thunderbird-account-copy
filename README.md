@@ -43,7 +43,7 @@ Message filters are considered to be in conflict if both of the following are tr
 
 Filters that have the same name but different conditions are *not* currently treated
 as a conflict. Once all the filters have been copied you will receive a prompt indicating
-the operation was sucessful.
+the operation was successful.
 
 ### Message Folders
 The next step in the process is copying message folders (unless skipped).
