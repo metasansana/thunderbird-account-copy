@@ -47,6 +47,11 @@ class TACFrontend {
     skip = [];
 
     /**
+     * isBusy indicates the app is doing something and should not be interrupted.
+     */
+    isBusy = false;
+
+    /**
      * source is the account id/key for the source account.
      *
      * @type {string}
@@ -115,6 +120,7 @@ class TACFrontend {
      * If there are no more steps the app is reset to the first stage.
      */
     next() {
+        this.isBusy = false; // implicit
         this.index++;
 
         if (this.current && this.skip.includes(this.current.name)) {
@@ -135,7 +141,7 @@ class TACFrontend {
     busy() {
         this.setContent(this.current.getTemplate("loading"));
         this.setCanContinue(false);
-        this.cancelButton.setAttribute("disabled", "");
+        this.isBusy = true;
     }
 
     /**
@@ -164,6 +170,8 @@ class TACFrontend {
         this.source = "";
         this.destination = "";
         this.cancelButton.onclick = () => {
+            if (this.isBusy)
+                alert("Please allow the current operation to complete.");
             this.start(); // resets the app.
         };
         this.continueButton.onclick = () => {
