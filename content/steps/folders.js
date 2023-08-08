@@ -8,6 +8,8 @@ import { FolderList } from "/content/components/folder-list.js";
  * FoldersStep handles the folder copying stage.
  */
 export class FoldersStep extends Step {
+    name = "folders";
+
     async onContinue() {
         this.app.busy();
 

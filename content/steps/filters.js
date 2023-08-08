@@ -7,6 +7,8 @@ import { Step } from "/content/steps/index.js";
  * FiltersStep handles the filter copying stage.
  */
 export class FiltersStep extends Step {
+    name = "filters";
+
     async onContinue() {
         this.app.busy();
 

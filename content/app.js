@@ -42,6 +42,11 @@ class TACFrontend {
     continueButton = document.getElementById("continueButton");
 
     /**
+     * skip contains the names off the steps that should be skipped.
+     */
+    skip = [];
+
+    /**
      * source is the account id/key for the source account.
      *
      * @type {string}
@@ -110,9 +115,13 @@ class TACFrontend {
      * If there are no more steps the app is reset to the first stage.
      */
     next() {
-        this.setCanContinue(true);
         this.index++;
-        if (this.index === this.steps.length) {
+
+        if (this.current && this.skip.includes(this.current.name)) {
+            this.index++;
+        }
+
+        if (this.index >= this.steps.length) {
             this.start();
         } else {
             this.current.show();
@@ -152,6 +161,8 @@ class TACFrontend {
             new FiltersStep(this),
             new FoldersStep(this)
         ];
+        this.source = "";
+        this.destination = "";
         this.cancelButton.onclick = () => {
             this.start(); // resets the app.
         };

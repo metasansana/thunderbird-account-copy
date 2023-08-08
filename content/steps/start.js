@@ -9,6 +9,16 @@ import { Step } from "/content/steps/index.js";
  */
 export class StartStep extends Step {
     /**
+     * @type {HTMLInputElement}
+     */
+    includeFilters;
+
+    /**
+     * @type {HTMLInputElement}
+     */
+    includeFolders;
+
+    /**
      * @type {HTMLSelectElement}
      */
     srcSelect;
@@ -24,16 +34,35 @@ export class StartStep extends Step {
     accounts = [];
 
     get canContinue() {
-        return this.app.source && this.app.destination;
+        return (
+            this.app.source &&
+            this.app.destination &&
+            (this.includeFilters.checked || this.includeFolders.checked)
+        );
     }
 
     /**
-     * onSelectChange enables the start button if both src and dest selects
+     * onIncludeChanged handles the user toggling the data copy targets.
+     */
+    onIncludeChanged = () => {
+        let skip = [];
+
+        if (!this.includeFilters.checked) skip.push(this.includeFilters.name);
+
+        if (!this.includeFolders.checked) skip.push(this.includeFolders.name);
+
+        this.app.skip = skip;
+
+        this.app.setCanContinue(this.canContinue);
+    };
+
+    /**
+     * onAccountChanged enables the start button if both src and dest selects
      * are valid.
      *
      * @param {Event} evt
      */
-    onSelectChange = evt => {
+    onAccountChanged = evt => {
         if (evt.target.id === "source") {
             let { value } = evt.target;
             this.app.source = value;
@@ -84,17 +113,28 @@ export class StartStep extends Step {
     }
 
     async show() {
-        let view = this.getTemplate("startStep");
-
-        this.srcSelect = view.getElementById("source");
-        this.destSelect = view.getElementById("destination");
         this.accounts = await this.app.send({
             type: events.MSG_LIST_ACCOUNTS
         });
 
+        let view = this.getTemplate("startStep");
+
+        this.includeFilters = view.getElementById("includeFilters");
+        this.includeFolders = view.getElementById("includeFolders");
+        this.includeFilters.onchange = this.onIncludeChanged;
+        this.includeFolders.onchange = this.onIncludeChanged;
+        this.includeFilters.checked = !this.app.skip.includes(
+            this.includeFilters.name
+        );
+        this.includeFolders.checked = !this.app.skip.includes(
+            this.includeFolders.name
+        );
+
+        this.srcSelect = view.getElementById("source");
+        this.destSelect = view.getElementById("destination");
         this.srcSelect.appendChild(this.getAccountOptions(this.accounts));
-        this.srcSelect.onchange = this.onSelectChange;
-        this.destSelect.onchange = this.onSelectChange;
+        this.srcSelect.onchange = this.onAccountChanged;
+        this.destSelect.onchange = this.onAccountChanged;
 
         this.app.setContent(view);
     }
