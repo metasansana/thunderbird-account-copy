@@ -81,7 +81,7 @@ https://support.mozilla.org/en-US/kb/how-customize-toolbars#
 
 ### Back Up Your Profile
 Before using this extension, ensure you have made a backup of your profile 
-folder [NOTE: MOST USERS DON'T KNOW WHAT THIS IS OR HOW TO DO IT!]. Copying of accounts is more or less a one-way operation and there is
+folder (see: https://support.mozilla.org/en-US/kb/profiles-where-thunderbird-stores-user-data#w_backing-up-a-profile). Copying of accounts is more or less a one-way operation and there is
 **no** support for undoing a copy. You will have to delete the copied filters,
 messages, and folders yourself, or ideally restore your profile from a backup. Once you
 are happy with the copy, you can delete the backup, if you wish.
